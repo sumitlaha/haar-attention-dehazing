@@ -34,8 +34,8 @@ class Cnv2D(Layer):
         self.cnv = Conv2D(filters=filters, kernel_size=kernel_size, strides=1,
                           padding='valid', kernel_initializer=INIT, use_bias=False)
         self.norm = InstanceNormalization(axis=-1, center=True, scale=True,
-                                          beta_initializer=INIT, gamma_initializer=INIT) if norm is not None else None
-        self.act = Activation(activation) if activation is not None else None
+                                          beta_initializer=INIT, gamma_initializer=INIT) if norm == 'in' else None
+        self.act = Activation(activation) if activation == 'relu' else None
 
     def call(self, inputs, training=None, **kwargs):
         x1 = self.pad(inputs)
@@ -45,12 +45,12 @@ class Cnv2D(Layer):
         return x4
 
 
-class ResBlock2(Layer):
+class ResBlock(Layer):
     def __init__(self, filters, kernel_size, use_cbam=False):
-        super(ResBlock2, self).__init__()
+        super(ResBlock, self).__init__()
         self.use_cbam = use_cbam
-        self.cnv0 = Cnv2D(filters=filters, kernel_size=kernel_size)
-        self.cnv1 = Cnv2D(filters=filters, kernel_size=kernel_size, activation=None)
+        self.cnv0 = Cnv2D(filters, kernel_size)
+        self.cnv1 = Cnv2D(filters, kernel_size, 'in', None)
         self.cbam = CBAM(filters)
         self.add = Add()
         self.act = Activation('relu')
@@ -60,10 +60,7 @@ class ResBlock2(Layer):
         x1 = self.cnv0(x0, training=training)
         x2 = self.cnv0(x1, training=training)
         x3 = self.cnv1(x2, training=training)
-        if self.use_cbam:
-            x4 = self.cbam(x3, training=training)
-        else:
-            x4 = x3
+        x4 = self.cbam(x3, training=training) if self.use_cbam else x3
         x5 = self.add([x0, x4])
         x6 = self.act(x5)
         return x6
@@ -92,7 +89,7 @@ class SpatialAttentionModule(Layer):
     def __init__(self, filters):
         super(SpatialAttentionModule, self).__init__()
         self.concat = Concatenate()
-        self.cnv = Cnv2D(filters=filters, kernel_size=7, activation=None, norm=None)
+        self.cnv = Cnv2D(filters, 7, None, None)
         self.sigma = Activation('sigmoid')
 
     def call(self, inputs, training=None, **kwargs):
@@ -146,8 +143,8 @@ class EncoderModule2(Layer):
         super(EncoderModule2, self).__init__()
         self.msbT = MSBPlaneThresholding()
         self.haar = WaveTFFactory.build('haar', dim=2)
-        self.cnv0 = Cnv2D(filters=filters, kernel_size=3)
-        self.cnv1 = Cnv2D(filters=filters * 2, kernel_size=3, activation='sigmoid')
+        self.cnv0 = Cnv2D(filters, 3)
+        self.cnv1 = Cnv2D(filters * 2, 3, 'in', 'sigmoid')
         self.cam = ChannelAttentionModule(filters)
         self.sam = SpatialAttentionModule(filters)
         self.max = MaxCoeff()
@@ -178,11 +175,11 @@ class DecoderModule2(Layer):
     def __init__(self, filters):
         super(DecoderModule2, self).__init__()
         self.ihaar = WaveTFFactory.build('haar', dim=2, inverse=True)
-        self.cnv0 = Cnv2D(filters=filters, kernel_size=3)
-        self.cnv1 = Cnv2D(filters=filters, kernel_size=3, activation='sigmoid')
+        self.cnv0 = Cnv2D(filters, 3)
+        self.cnv1 = Cnv2D(filters, 3, 'in', 'sigmoid')
         self.pool = AveragePooling2D()
         # self.pool = MaxPool2D()
-        self.res = ResBlock2(filters=filters, kernel_size=3, use_cbam=True)
+        self.res = ResBlock(filters=filters, kernel_size=3, use_cbam=True)
 
     def call(self, inputs, training=None, **kwargs):
         x0 = self.cnv0(inputs[0], training=training)
@@ -196,11 +193,11 @@ class DecoderModule2(Layer):
 class MainModule(Layer):
     def __init__(self, filters):
         super(MainModule, self).__init__()
-        self.cnv0 = Cnv2D(filters=5, kernel_size=3)
+        self.cnv0 = Cnv2D(5, 3)
         # self.cnv0 = Cnv2D(filters=int(filters/2), kernel_size=3)
-        self.cnv1 = Cnv2D(filters=filters, kernel_size=3, activation='sigmoid')
+        self.cnv1 = Cnv2D(filters, 3, 'in', 'sigmoid')
         # self.cnv2 = Cnv2D(filters=3, kernel_size=3, activation=None, norm=None)
-        self.cnv2 = Cnv2D(filters=3, kernel_size=1, activation=None, norm=None)
+        self.cnv2 = Cnv2D(3, 1, None, None)
         self.em1 = EncoderModule2(int(filters))
         self.em2 = EncoderModule2(int(filters * 2))
         self.em3 = EncoderModule2(int(filters * 4))
