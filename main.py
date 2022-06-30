@@ -7,7 +7,7 @@ import tensorflow as tf
 import losses
 from callbacks import CustomCallback
 from data_loader3 import load_data
-from models.model18 import HaarNet
+from models.haarnet import HaarNet
 
 
 def main(args):
