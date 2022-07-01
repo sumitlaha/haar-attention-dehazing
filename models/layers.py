@@ -46,7 +46,7 @@ class Cnv2D(Layer):
 
 
 class ResBlock(Layer):
-    def __init__(self, filters, kernel_size, use_cbam=False):
+    def __init__(self, filters, kernel_size, use_cbam=True):
         super(ResBlock, self).__init__()
         self.use_cbam = use_cbam
         self.cnv0 = Cnv2D(filters, kernel_size)
@@ -138,9 +138,9 @@ class MSBPlaneThresholding(Layer):
         return tf.transpose(x1, [0, 2, 3, 1])
 
 
-class EncoderModule2(Layer):
+class EncoderModule(Layer):
     def __init__(self, filters):
-        super(EncoderModule2, self).__init__()
+        super(EncoderModule, self).__init__()
         self.msbT = MSBPlaneThresholding()
         self.haar = WaveTFFactory.build('haar', dim=2)
         self.cnv0 = Cnv2D(filters, 3)
@@ -171,15 +171,15 @@ class EncoderModule2(Layer):
         return x8, x0[..., self.f:]
 
 
-class DecoderModule2(Layer):
+class DecoderModule(Layer):
     def __init__(self, filters):
-        super(DecoderModule2, self).__init__()
+        super(DecoderModule, self).__init__()
         self.ihaar = WaveTFFactory.build('haar', dim=2, inverse=True)
         self.cnv0 = Cnv2D(filters, 3)
         self.cnv1 = Cnv2D(filters, 3, 'in', 'sigmoid')
         self.pool = AveragePooling2D()
         # self.pool = MaxPool2D()
-        self.res = ResBlock(filters=filters, kernel_size=3, use_cbam=True)
+        self.res = ResBlock(filters=filters, kernel_size=3)
 
     def call(self, inputs, training=None, **kwargs):
         x0 = self.cnv0(inputs[0], training=training)
@@ -194,18 +194,16 @@ class MainModule(Layer):
     def __init__(self, filters):
         super(MainModule, self).__init__()
         self.cnv0 = Cnv2D(5, 3)
-        # self.cnv0 = Cnv2D(filters=int(filters/2), kernel_size=3)
         self.cnv1 = Cnv2D(filters, 3, 'in', 'sigmoid')
-        # self.cnv2 = Cnv2D(filters=3, kernel_size=3, activation=None, norm=None)
         self.cnv2 = Cnv2D(3, 1, None, None)
-        self.em1 = EncoderModule2(int(filters))
-        self.em2 = EncoderModule2(int(filters * 2))
-        self.em3 = EncoderModule2(int(filters * 4))
-        self.em4 = EncoderModule2(int(filters * 8))
-        self.dm0 = DecoderModule2(int(filters))
-        self.dm1 = DecoderModule2(int(filters * 2))
-        self.dm2 = DecoderModule2(int(filters * 4))
-        self.dm3 = DecoderModule2(int(filters * 8))
+        self.em1 = EncoderModule(int(filters))
+        self.em2 = EncoderModule(int(filters * 2))
+        self.em3 = EncoderModule(int(filters * 4))
+        self.em4 = EncoderModule(int(filters * 8))
+        self.dm0 = DecoderModule(int(filters))
+        self.dm1 = DecoderModule(int(filters * 2))
+        self.dm2 = DecoderModule(int(filters * 4))
+        self.dm3 = DecoderModule(int(filters * 8))
 
     def call(self, inputs, training=None, **kwargs):
         # lvl E0
