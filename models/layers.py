@@ -149,13 +149,11 @@ class EncoderModule(Layer):
         self.sam = SpatialAttentionModule(filters)
         self.max = MaxCoeff()
         self.add = Add()
-        # self.act = Activation('sigmoid')
         self.f = filters
 
     def call(self, inputs, training=None, **kwargs):
         x = self.msbT(inputs)
         x0 = self.haar.call(x)
-        # x0 = self.haar.call(inputs)
         x1 = self.cnv0(x0[..., self.f:self.f * 2], training=training)
         x1 = self.sam(x1, training=training)
         x2 = self.cnv0(x0[..., self.f * 2:self.f * 3], training=training)
@@ -167,7 +165,6 @@ class EncoderModule(Layer):
         x6 = self.cam(x5)
         x7 = self.add([x4, x6])
         x8 = self.cnv1(x7, training=training)
-        # x9 = self.act(x8)
         return x8, x0[..., self.f:]
 
 
@@ -178,7 +175,6 @@ class DecoderModule(Layer):
         self.cnv0 = Cnv2D(filters, 3)
         self.cnv1 = Cnv2D(filters, 3, 'in', 'sigmoid')
         self.pool = AveragePooling2D()
-        # self.pool = MaxPool2D()
         self.res = ResBlock(filters=filters, kernel_size=3)
 
     def call(self, inputs, training=None, **kwargs):

@@ -2,12 +2,10 @@ import tensorflow as tf
 
 
 class CustomCallback(tf.keras.callbacks.Callback):
-    def __init__(self, dir_logs, ckpt, val_ds, sample_size):
+    def __init__(self, dir_logs, ckpt):
         super(CustomCallback, self).__init__()
         self.log_dir = dir_logs
         self.checkpoint = ckpt
-        self.val_ds = val_ds
-        self.sample_size = sample_size
         self.summary_writer_trn = tf.summary.create_file_writer(dir_logs + "/train/")
         self.summary_writer_val = tf.summary.create_file_writer(dir_logs + "/val/")
 
@@ -24,6 +22,4 @@ class CustomCallback(tf.keras.callbacks.Callback):
         # saving (checkpoint) the model every 10 epochs
         if (epoch + 1) % 10 == 0:
             self.checkpoint.save(file_prefix=self.log_dir + '/tf_ckpts/ckpt')
-            print()
-            print('Checkpoint saved...')
-            print()
+            print('\nCheckpoint saved...\n')
