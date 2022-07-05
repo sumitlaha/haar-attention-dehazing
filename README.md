@@ -1,6 +1,8 @@
 # Haar wavelets-based attention network for image dehazing
-by [Sumit Laha](https://www.cs.ucf.edu/~laha/) and [Hassan Foroosh](https://cil.cs.ucf.edu/people/faculty/)
+by [Sumit Laha](https://www.cs.ucf.edu/~laha/) and [Hassan Foroosh](https://cil.cs.ucf.edu/people/faculty/)\
 The original article can be found at [].
+## Abstract
+Weather conditions such as haze, mist, and fog can degrade the image clarity in outdoor scenes. Although various image dehazing techniques exist in the literature, it is very challenging to remove non-homogeneous and/or densely concentrated homogeneous fog. We propose an end-to-end dehazing network that utilizes attention-based learning from Haar wavelet coefficients. The model uses multi-scale wavelet transformation to break down feature maps into low- and high-frequency coefficients. The channel attention layer learns haze features while the spatial attention layer focuses on the feature location from these coefficients to further refine the output. Quantitative and visual analyses demonstrate that the proposed framework outperforms recent state-of-the-art methods in removing haze from dense and non-homogeneous hazy images while maintaining color accuracy.
 ## Framework
 <img src="figs/framework.png" alt="Framework of the proposed algorithm.">
 
