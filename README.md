@@ -8,8 +8,7 @@ The original article can be found at [].
 - Qualitative analysis on NH-Haze dataset - (a) Hazy image, (b) DehazeNet, (c) MSCNN, (d) AOD-Net, (e) AMEF, (f)
 GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src="figs/qual_nh-haze.png" alt="Qualitative analysis on NH-Haze dataset">
 - Qualitative analysis on Dense-Haze dataset - (a) Hazy image, (b) DehazeNet, (c) MSCNN, (d) AOD-Net, (e) AMEF, (f)
-GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth:
-<img src="figs/qual_d-haze.png" alt="Qualitative analysis on Dense-Haze dataset">
+GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src="figs/qual_d-haze.png" alt="Qualitative analysis on Dense-Haze dataset">
 
 ## Quantitative analysis
 <table>
