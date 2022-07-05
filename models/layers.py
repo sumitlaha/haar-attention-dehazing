@@ -1,6 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Activation, Add, AveragePooling2D, Concatenate, Conv2D, Layer, \
-    Dense
+from tensorflow.keras.layers import Activation, Add, AveragePooling2D, Concatenate, Conv2D, Layer, Dense
 from tensorflow_addons.layers import InstanceNormalization
 
 from wavetf import WaveTFFactory
