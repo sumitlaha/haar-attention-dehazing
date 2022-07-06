@@ -9,8 +9,6 @@ from callbacks import CustomCallback
 from dataloader import load_data
 from models.haarnet import HaarNet
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
 
 def main(args):
     if not os.path.exists(args.dir_logs):
