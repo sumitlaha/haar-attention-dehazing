@@ -99,6 +99,7 @@ GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src
 - tensorflow_addons
 - tensorflow_datasets
 - [wavetf](https://github.com/fversaci/wavetf)
-## Train and Test
+## Training and testing
 Run the ```main.py``` file with the ```--train``` and ```--test``` flags set to 0 or 1 to disable/enable training and
-testing as required.
+testing as required. Other details about different parameters like batch size, epochs, filter size etc. can be found in
+the ```main.py``` file.

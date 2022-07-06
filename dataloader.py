@@ -149,23 +149,23 @@ def prepare(ds, batch_size, shuffle=False):
 
 def load_data(ds_train, ds_val, ds_test, sz_trn, batch_size=1):
     # Train dataset
-    if ds_train == 'nyudv2':
+    if ds_train == 'NYUD_V2':           # NYU Depth dataset V2
         data_train = load_nyudv2(sz_trn)
     else:
         return
     data_train = prepare(data_train, batch_size=batch_size, shuffle=True)
 
     # Validation dataset
-    if ds_val == 'middlebury':
+    if ds_val == 'MBURY':               # Middlebury dataset
         data_val = load_middlebury()
     else:
         return
     data_val = prepare(data_val, batch_size=1)
 
     # Test dataset
-    if ds_test == 'd_haze':
+    if ds_test == 'D_HAZE':             # Dense-Haze dataset
         data_test = load_dense_haze()
-    elif ds_test == 'nh_haze':
+    elif ds_test == 'NH_HAZE':          # NH-Haze dataset
         data_test = load_nh_haze()
     else:
         return

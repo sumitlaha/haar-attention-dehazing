@@ -9,6 +9,8 @@ from callbacks import CustomCallback
 from dataloader import load_data
 from models.haarnet import HaarNet
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 
 def main(args):
     if not os.path.exists(args.dir_logs):
@@ -17,42 +19,48 @@ def main(args):
         params = vars(args)
         for key in params.keys():
             file.write('{}: {}\n'.format(key, params[key]))
-
     # Datasets
     data_train, data_val, data_test = load_data(ds_train=args.data_train,
                                                 ds_val=args.data_val,
                                                 ds_test=args.data_test,
                                                 sz_trn=args.size_train,
                                                 batch_size=args.batch_size)
-    # Define the Optimizers
+    # Define the optimizer
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.lr, beta_1=args.adam_b1, beta_2=args.adam_b2)
     # Define loss
     loss_obj = losses.NetLoss(args.loss_mu1, args.loss_mu2)
     # Define model
     model = HaarNet(args.filters)
-    # Define the Checkpoint-saver
+    # Define the checkpoint-saver
     ckpt = tf.train.Checkpoint(optimizer=optimizer, model=model)
-
+    # Compile
+    model.compile(optimizer=optimizer, loss_fn=loss_obj)
     # Train
-    model.compile(optimizer=optimizer,
-                  loss_fn=loss_obj)
     if args.train:
         model.fit(x=data_train, epochs=args.epochs,
                   callbacks=[CustomCallback(args.dir_logs, ckpt)],
                   validation_data=data_val)
+    # Test
     if args.test:
+        if args.ckpt_path != '' and args.train == 0:
+            # This loads the latest checkpoint file. Modify the following code to load other checkpoint files.
+            ckpt.restore(tf.train.latest_checkpoint(args.ckpt_path)).expect_partial()
+        else:
+            print('No checkpoint path mentioned for testing only...\nExiting...')
+            exit()
+        print('Testing on ' + args.data_test + ' dataset...')
         model.evaluate(x=data_test)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Dehazing model')
-    parser.add_argument('--train', type=int, default=1, help='Enable/disable training')
+    parser.add_argument('--train', type=int, default=0, help='Enable/disable training')
     parser.add_argument('--test', type=int, default=0, help='Enable/disable testing')
-    parser.add_argument('--data_train', type=str, default='nyudv2',
-                        help='The directory of the train dataset - nyudv2 / diode')
-    parser.add_argument('--data_val', type=str, default='middlebury',
+    parser.add_argument('--data_train', type=str, default='NYUD_V2',
+                        help='The directory of the train dataset')
+    parser.add_argument('--data_val', type=str, default='MBURY',
                         help='The directory of the validation dataset')
-    parser.add_argument('--data_test', type=str, default='nh_haze',
+    parser.add_argument('--data_test', type=str, default='NH_HAZE',
                         help='The directory of the test dataset')
     parser.add_argument('--size_train', type=int, default=5000,
                         help='The size of the train dataset')
@@ -68,6 +76,8 @@ if __name__ == '__main__':
     parser.add_argument('--loss_mu1', type=float, default=0.01, help='Set the mu1 value of loss')
     parser.add_argument('--loss_mu2', type=float, default=0.1, help='Set the mu2 value of loss')
     parser.add_argument('--epochs', type=int, default=2, help='Set the number of epochs')
+    parser.add_argument('--ckpt_path', type=str, default='',
+                        help='The directory of the checkpoint file')
     parser.add_argument('--dir_logs', type=str, default='logs/' + datetime.now().strftime("%Y%m%d-%H%M%S"),
                         help='DO NOT MODIFY. The directory of tensorboard logs.')
 

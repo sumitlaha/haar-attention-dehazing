@@ -3,7 +3,8 @@ import tensorflow as tf
 from models.layers import MainModule
 from metrics import PSNR, SSIM
 
-loss_tracker = tf.keras.metrics.Mean(name='loss')
+loss_train = tf.keras.metrics.Mean(name='train_loss')
+loss_test = tf.keras.metrics.Mean(name='test_loss')
 psnr_metric = PSNR(name='psnr')
 ssim_metric = SSIM(name='ssim')
 
@@ -36,11 +37,11 @@ class HaarNet(tf.keras.Model):
         # Update weights
         self.optimizer.apply_gradients(zip(grads_net, self.net.trainable_variables))
         # Compute metrics
-        loss_tracker.update_state(loss_net)
+        loss_train.update_state(loss_net)
         # Update metrics (includes the metric that tracks the loss)
         psnr_metric.update_state(im_j, yp)
         ssim_metric.update_state(im_j, yp)
-        return {'loss': loss_tracker.result(), 'psnr': psnr_metric.result(), 'ssim': ssim_metric.result()}
+        return {'loss': loss_train.result(), 'psnr': psnr_metric.result(), 'ssim': ssim_metric.result()}
 
     @tf.function
     def test_step(self, data):
@@ -50,7 +51,7 @@ class HaarNet(tf.keras.Model):
         # Updates metrics tracking loss
         loss_net = self.loss_fn(im_j, yp)
         # Update metrics
-        loss_tracker.update_state(loss_net)
+        loss_test.update_state(loss_net)
         psnr_metric.update_state(im_j, yp)
         ssim_metric.update_state(im_j, yp)
-        return {'loss': loss_tracker.result(), 'psnr': psnr_metric.result(), 'ssim': ssim_metric.result()}
+        return {'loss': loss_test.result(), 'psnr': psnr_metric.result(), 'ssim': ssim_metric.result()}
