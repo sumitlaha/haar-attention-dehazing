@@ -31,29 +31,29 @@ def main(args):
     model = HaarNet(args.filters)
     # Define the checkpoint-saver
     ckpt = tf.train.Checkpoint(optimizer=optimizer, model=model)
+    # Callbacks
+    callbacks = [CustomCallback(args.dir_logs, ckpt, data_test)]
     # Compile
     model.compile(optimizer=optimizer, loss_fn=loss_obj)
     # Train
     if args.train:
-        model.fit(x=data_train, epochs=args.epochs,
-                  callbacks=[CustomCallback(args.dir_logs, ckpt)],
-                  validation_data=data_val)
+        model.fit(x=data_train, epochs=args.epochs, callbacks=callbacks, validation_data=data_val)
     # Test
     if args.test:
         if args.ckpt_path != '' and args.train == 0:
-            # This loads the latest checkpoint file. Modify the following code to load other checkpoint files.
+            # This loads the latest checkpoint file. Modify the code accordingly to load other checkpoints.
             ckpt.restore(tf.train.latest_checkpoint(args.ckpt_path)).expect_partial()
         else:
             print('No checkpoint path mentioned for testing only...\nExiting...')
             exit()
         print('Testing on ' + args.data_test + ' dataset...')
-        model.evaluate(x=data_test)
+        model.evaluate(x=data_test, callbacks=callbacks)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Dehazing model')
     parser.add_argument('--train', type=int, default=0, help='Enable/disable training')
-    parser.add_argument('--test', type=int, default=0, help='Enable/disable testing')
+    parser.add_argument('--test', type=int, default=1, help='Enable/disable testing')
     parser.add_argument('--data_train', type=str, default='NYUD_V2',
                         help='The directory of the train dataset')
     parser.add_argument('--data_val', type=str, default='MBURY',
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('--loss_mu1', type=float, default=0.01, help='Set the mu1 value of loss')
     parser.add_argument('--loss_mu2', type=float, default=0.1, help='Set the mu2 value of loss')
     parser.add_argument('--epochs', type=int, default=2, help='Set the number of epochs')
-    parser.add_argument('--ckpt_path', type=str, default='',
+    parser.add_argument('--ckpt_path', type=str, default='tf_ckpts',
                         help='The directory of the checkpoint file')
     parser.add_argument('--dir_logs', type=str, default='logs/' + datetime.now().strftime("%Y%m%d-%H%M%S"),
                         help='DO NOT MODIFY. The directory of tensorboard logs.')

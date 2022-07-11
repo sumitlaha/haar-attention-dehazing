@@ -94,7 +94,7 @@ GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src
 </tbody>
 </table>
 
-## Libraries required
+## Major libraries
 - tensorflow
 - tensorflow_addons
 - tensorflow_datasets

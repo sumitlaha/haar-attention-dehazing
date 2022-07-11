@@ -1,17 +1,20 @@
+import matplotlib.pyplot as plt
 import tensorflow as tf
 
 
-def psnr(y_true, y_pred):
-    y_true = standardize(y_true, axes=[1, 2])
-    y_pred = standardize(y_pred, axes=[1, 2])
-    return tf.image.psnr(y_true, y_pred, max_val=1.0)
-
-
-def ssim(y_true, y_pred):
-    y_true = standardize(y_true, axes=[1, 2])
-    y_pred = standardize(y_pred, axes=[1, 2])
-    return tf.image.ssim(y_true, y_pred, max_val=1.0, filter_size=11,
-                         filter_sigma=1.5, k1=0.01, k2=0.03)
+def display_images(imgs, titles, samples):
+    plt.figure(figsize=(20, 12))
+    sz = len(titles)
+    for i in range(samples * sz):
+        title = titles[i % sz]
+        plt.subplot(samples, sz, i + 1, title=title)
+        plt.tight_layout()
+        plt.xticks([])
+        plt.yticks([])
+        plt.grid(False)
+        img = tf.clip_by_value(imgs[i], 0, 1)
+        plt.imshow(img, vmin=0, vmax=1)
+    plt.show()
 
 
 def standardize(data, axes=None, eps=1e-08):
