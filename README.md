@@ -14,10 +14,9 @@ non-homogeneous hazy images while maintaining color accuracy.
 <img src="figs/framework.png" alt="Framework of the proposed algorithm.">
 
 ## Qualitative analysis
-- Qualitative analysis on NH-Haze dataset - (a) Hazy image, (b) DehazeNet, (c) MSCNN, (d) AOD-Net, (e) AMEF, (f)
-GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src="figs/qual_nh-haze.png" alt="Qualitative analysis on NH-Haze dataset">
-- Qualitative analysis on Dense-Haze dataset - (a) Hazy image, (b) DehazeNet, (c) MSCNN, (d) AOD-Net, (e) AMEF, (f)
-GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth: <img src="figs/qual_d-haze.png" alt="Qualitative analysis on Dense-Haze dataset">
+Images - (a) Hazy image, (b) DehazeNet, (c) MSCNN, (d) AOD-Net, (e) AMEF, (f) GridDehazeNet, (g) PADMEF, (h) FMEF, (i) Proposed and (j) Ground-truth
+- On NH-Haze dataset: <img src="figs/qual_nh-haze.png" alt="Qualitative analysis on NH-Haze dataset">
+- On Dense-Haze dataset: <img src="figs/qual_d-haze.png" alt="Qualitative analysis on Dense-Haze dataset">
 
 ## Quantitative analysis
 <table>
